@@ -1,3 +1,6 @@
+### Diagrama de Banco de Dados
+
+```mermaid
 erDiagram
     PESSOA ||--o{ TRANSACAO : "possui"
     CATEGORIA ||--o{ TRANSACAO : "classifica"
@@ -22,3 +25,4 @@ erDiagram
         Guid PessoaId FK
         Guid CategoriaId FK
     }
+```
