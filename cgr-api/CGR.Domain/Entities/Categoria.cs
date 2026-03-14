@@ -32,11 +32,11 @@ public class Categoria
     }
 
     // Método de validação de dados, garantindo o Rich Domain Model e evitando que a entidade seja criada ou atualizada com dados inválidos.
-    private void ValidarDados(string descricao, FinalidadeCategoria finalidade)
+    private static void ValidarDados(string descricao, FinalidadeCategoria finalidade)
     {
         if (string.IsNullOrWhiteSpace(descricao))
             throw new ArgumentException("A descrição é obrigatória.");
-        if (!Enum.IsDefined(typeof(FinalidadeCategoria), finalidade))
+        if (!Enum.IsDefined(finalidade))
             throw new ArgumentException("A finalidade de categoria inválida.");
     }
 }
