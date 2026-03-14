@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CGR.Api/CGR.Api.csproj" />
+  <Project Path="CGR.Application/CGR.Application.csproj" />
+  <Project Path="CGR.Domain/CGR.Domain.csproj" />
+  <Project Path="CGR.Infrastructure/CGR.Infrastructure.csproj" />
+</Solution>
