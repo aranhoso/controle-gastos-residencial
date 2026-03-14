@@ -1,5 +1,6 @@
-﻿namespace CGR.Domain.Entities;
-using CGR.Domain.Enums;
+﻿using CGR.Domain.Enums;
+
+namespace CGR.Domain.Entities;
 
 public class Categoria
 {
