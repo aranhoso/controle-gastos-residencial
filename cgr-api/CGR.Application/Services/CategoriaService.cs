@@ -59,10 +59,6 @@ public class CategoriaService : ICategoriaService
     /// <summary>
     /// Remove uma categoria existente.
     /// </summary>
-    /// <remarks>
-    /// Neste projeto, a verificação prévia de existência foi mantida para deixar o fluxo explícito
-    /// e facilitar o entendimento do passo a passo da operação.
-    /// </remarks>
     /// <param name="id">Identificador único da categoria.</param>
     /// <returns>Uma tarefa assíncrona representando a remoção.</returns>
     /// <exception cref="NotFoundException">Lançada quando a categoria não for encontrada.</exception>
