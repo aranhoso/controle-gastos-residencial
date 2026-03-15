@@ -1,0 +1,88 @@
+:root {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #1f2a37;
+	background: #f7f8fb;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+}
+
+#root {
+	min-height: 100vh;
+}
+
+.app-shell {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.navbar {
+	padding: 12px 16px;
+	border-bottom: 1px solid #d9deea;
+	background: #ffffff;
+}
+
+.navbar-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.navbar-link {
+	border: 1px solid #cdd5e1;
+	background: #f8fafc;
+	color: #1f2937;
+	padding: 8px 12px;
+	border-radius: 8px;
+	font-size: 0.95rem;
+	cursor: pointer;
+}
+
+.navbar-link:hover {
+	background: #eef2f7;
+}
+
+.navbar-link.is-active {
+	background: #e2e8f0;
+	border-color: #94a3b8;
+}
+
+.app-content {
+	flex: 1;
+	padding: 16px;
+}
+
+.page-placeholder {
+	min-height: calc(100vh - 86px);
+	border: 1px dashed #cbd5e1;
+	border-radius: 12px;
+	background: #ffffff;
+}
+
+@media (max-width: 640px) {
+	.navbar {
+		padding: 10px;
+	}
+
+	.navbar-list {
+		gap: 6px;
+	}
+
+	.navbar-link {
+		width: 100%;
+		text-align: left;
+	}
+
+	.app-content {
+		padding: 10px;
+	}
+}
