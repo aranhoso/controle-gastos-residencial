@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:18.3
+    container_name: cgr-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha
+      POSTGRES_DB: cgr_db
+    volumes:
+      - cgr-pgdata:/var/lib/postgresql/data
+
+volumes:
+  cgr-pgdata:
