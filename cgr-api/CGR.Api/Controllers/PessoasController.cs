@@ -38,7 +38,7 @@ public class PessoasController : ControllerBase
         {
             var pessoaCriada = await _pessoaService.CriarAsync(dto);
 
-            return CreatedAtAction(nameof(ObterPorIdAsync), new { id = pessoaCriada.Id }, pessoaCriada);
+            return CreatedAtRoute("GetPessoaById", new { id = pessoaCriada.Id }, pessoaCriada);
         }
         catch (ArgumentException ex)
         {
@@ -77,7 +77,7 @@ public class PessoasController : ControllerBase
     /// <see cref="NotFoundObjectResult"/> quando não existir,
     /// ou <see cref="ObjectResult"/> com status 500 em caso de erro inesperado.
     /// </returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetPessoaById")]
     public async Task<IActionResult> ObterPorIdAsync(Guid id)
     {
         try

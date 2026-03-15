@@ -39,7 +39,7 @@ public class TransacoesController : ControllerBase
         {
             var transacaoCriada = await _transacaoService.CriarAsync(dto);
 
-            return CreatedAtAction(nameof(ObterPorIdAsync), new { id = transacaoCriada.Id }, transacaoCriada);
+            return CreatedAtRoute("GetTransacaoById", new { id = transacaoCriada.Id }, transacaoCriada);
         }
         catch (NotFoundException ex)
         {
@@ -82,7 +82,7 @@ public class TransacoesController : ControllerBase
     /// <see cref="NotFoundObjectResult"/> quando não existir,
     /// ou <see cref="ObjectResult"/> com status 500 em caso de erro inesperado.
     /// </returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetTransacaoById")]
     public async Task<IActionResult> ObterPorIdAsync(Guid id)
     {
         try

@@ -38,7 +38,7 @@ public class CategoriasController : ControllerBase
         {
             var categoriaCriada = await _categoriaService.CriarAsync(dto);
 
-            return CreatedAtAction(nameof(ObterPorIdAsync), new { id = categoriaCriada.Id }, categoriaCriada);
+            return CreatedAtRoute("GetCategoriaById", new { id = categoriaCriada.Id }, categoriaCriada);
         }
         catch (ArgumentException ex)
         {
@@ -77,7 +77,7 @@ public class CategoriasController : ControllerBase
     /// <see cref="NotFoundObjectResult"/> quando não existir,
     /// ou <see cref="ObjectResult"/> com status 500 em caso de erro inesperado.
     /// </returns>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "GetCategoriaById")]
     public async Task<IActionResult> ObterPorIdAsync(Guid id)
     {
         try
