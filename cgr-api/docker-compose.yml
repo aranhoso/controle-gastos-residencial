@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: senha
       POSTGRES_DB: cgr_db
     volumes:
-      - cgr-pgdata:/var/lib/postgresql/data
+      - cgr-pgdata:/var/lib/postgresql
 
 volumes:
   cgr-pgdata:
