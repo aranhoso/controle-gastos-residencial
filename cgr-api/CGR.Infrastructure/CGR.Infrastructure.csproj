@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\CGR.Application\CGR.Application.csproj" />
+    <ProjectReference Include="..\CGR.Domain\CGR.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
