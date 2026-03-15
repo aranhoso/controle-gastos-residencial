@@ -68,7 +68,6 @@ public class PessoaRepository : IPessoaRepository
     /// </returns>
     public async Task<Pessoa?> ObterPorIdAsync(Guid id)
     {
-        // O FindAsync é a forma mais rápida do EF Core de buscar pela Chave Primária
         return await _context.Pessoas.FindAsync(id);
     }
 
@@ -78,8 +77,6 @@ public class PessoaRepository : IPessoaRepository
     /// <returns>Uma coleção com todas as pessoas persistidas no banco de dados.</returns>
     public async Task<IEnumerable<Pessoa>> ObterTodasAsync()
     {
-        // Dica de Sênior: O AsNoTracking() diz ao EF Core para não "ficar vigiando" essa lista,
-        // o que deixa a consulta de leitura muuuito mais rápida e consome menos memória RAM.
         return await _context.Pessoas.AsNoTracking().ToListAsync();
     }
 }
