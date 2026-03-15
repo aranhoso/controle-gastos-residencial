@@ -14,5 +14,7 @@ public sealed class TransacaoResponseDTO
     public TipoTransacao Tipo { get; set; }
     public string TipoDescricao => Tipo.ToString();
     public Guid PessoaId { get; set; }
+    public string NomePessoa { get; set; } = string.Empty;
     public Guid CategoriaId { get; set; }
+    public string DescricaoCategoria { get; set; } = string.Empty;
 }

@@ -50,7 +50,7 @@ public class TransacaoService : ITransacaoService
 
         await _transacaoRepository.InserirAsync(transacao);
 
-        return MapearParaResponseDTO(transacao);
+        return MapearParaResponseDTO(transacao, pessoa.Nome, categoria.Descricao);
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public class TransacaoService : ITransacaoService
 
         await _transacaoRepository.AtualizarAsync(transacao);
 
-        return MapearParaResponseDTO(transacao);
+        return MapearParaResponseDTO(transacao, pessoa.Nome, categoria.Descricao);
     }
 
     /// <summary>
@@ -114,15 +114,20 @@ public class TransacaoService : ITransacaoService
     {
         var transacoes = await _transacaoRepository.ObterTodasAsync();
 
-        return transacoes.Select(MapearParaResponseDTO);
+        return transacoes.Select(t => MapearParaResponseDTO(t));
     }
 
     /// <summary>
     /// Converte a entidade de domínio <see cref="Transacao"/> para <see cref="TransacaoResponseDTO"/>.
     /// </summary>
     /// <param name="transacao">Entidade de transação a ser convertida.</param>
+    /// <param name="nomePessoa">Nome da pessoa associada, quando já conhecido no fluxo.</param>
+    /// <param name="descricaoCategoria">Descrição da categoria associada, quando já conhecida no fluxo.</param>
     /// <returns>DTO de resposta correspondente.</returns>
-    private static TransacaoResponseDTO MapearParaResponseDTO(Transacao transacao)
+    private static TransacaoResponseDTO MapearParaResponseDTO(
+        Transacao transacao,
+        string? nomePessoa = null,
+        string? descricaoCategoria = null)
     {
         return new TransacaoResponseDTO
         {
@@ -131,7 +136,9 @@ public class TransacaoService : ITransacaoService
             Valor = transacao.Valor,
             Tipo = transacao.Tipo,
             PessoaId = transacao.PessoaId,
-            CategoriaId = transacao.CategoriaId
+            NomePessoa = nomePessoa ?? transacao.Pessoa?.Nome ?? string.Empty,
+            CategoriaId = transacao.CategoriaId,
+            DescricaoCategoria = descricaoCategoria ?? transacao.Categoria?.Descricao ?? string.Empty
         };
     }
 }
