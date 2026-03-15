@@ -1,4 +1,5 @@
 ﻿using CGR.Domain.Entities;
+using CGR.Domain.Exceptions;
 using CGR.Domain.Interfaces;
 using CGR.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -50,13 +51,11 @@ public class TransacaoRepository : ITransacaoRepository
     /// <returns>Uma tarefa assíncrona que representa a operação de remoção.</returns>
     public async Task DeletarAsync(Guid id)
     {
-        var transacao = await _context.Transacoes.FindAsync(id);
+        var transacao = await _context.Transacoes.FindAsync(id)
+            ?? throw new NotFoundException(nameof(Transacao), id);
 
-        if (transacao != null)
-        {
-            _context.Transacoes.Remove(transacao);
-            await _context.SaveChangesAsync();
-        }
+        _context.Transacoes.Remove(transacao);
+        await _context.SaveChangesAsync();
     }
 
     /// <summary>

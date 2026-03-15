@@ -1,4 +1,5 @@
 ﻿using CGR.Domain.Entities;
+using CGR.Domain.Exceptions;
 using CGR.Domain.Interfaces;
 using CGR.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -50,13 +51,11 @@ public class CategoriaRepository : ICategoriaRepository
     /// <returns>Uma tarefa assíncrona que representa a operação de remoção.</returns>
     public async Task DeletarAsync(Guid id)
     {
-        var categoria = await _context.Categorias.FindAsync(id);
+        var categoria = await _context.Categorias.FindAsync(id)
+            ?? throw new NotFoundException(nameof(Categoria), id);
 
-        if (categoria != null)
-        {
-            _context.Categorias.Remove(categoria);
-            await _context.SaveChangesAsync();
-        }
+        _context.Categorias.Remove(categoria);
+        await _context.SaveChangesAsync();
     }
 
     /// <summary>
