@@ -1,28 +1,29 @@
+import { NavLink } from 'react-router-dom';
+
 type NavItem = {
-  key: string;
+  to: string;
   label: string;
+  end?: boolean;
 };
 
 type NavbarProps = {
   items: NavItem[];
-  activeKey: string;
-  onSelect: (key: string) => void;
 };
 
-const Navbar = ({ items, activeKey, onSelect }: NavbarProps) => {
+const Navbar = ({ items }: NavbarProps) => {
   return (
     <header className="navbar">
       <nav aria-label="Menu principal">
         <ul className="navbar-list">
           {items.map((item) => (
-            <li key={item.key}>
-              <button
-                type="button"
-                className={`navbar-link ${activeKey === item.key ? 'is-active' : ''}`}
-                onClick={() => onSelect(item.key)}
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => `navbar-link ${isActive ? 'is-active' : ''}`}
               >
                 {item.label}
-              </button>
+              </NavLink>
             </li>
           ))}
         </ul>

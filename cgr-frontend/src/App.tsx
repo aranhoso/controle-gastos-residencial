@@ -1,4 +1,4 @@
-import { useState, type JSX } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
 import CategoriasPage from './pages/CategoriasPage';
@@ -9,32 +9,30 @@ import TotaisPorPessoaPage from './pages/TotaisPorPessoaPage';
 import TransacoesPage from './pages/TransacoesPage';
 
 const navItems = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'pessoas', label: 'Pessoas' },
-  { key: 'categorias', label: 'Categorias' },
-  { key: 'transacoes', label: 'Transações' },
-  { key: 'totais-por-pessoa', label: 'Totais por Pessoa' },
-  { key: 'totais-por-categoria', label: 'Totais por Categoria' },
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/pessoas', label: 'Pessoas' },
+  { to: '/categorias', label: 'Categorias' },
+  { to: '/transacoes', label: 'Transações' },
+  { to: '/totais-por-pessoa', label: 'Totais por Pessoa' },
+  { to: '/totais-por-categoria', label: 'Totais por Categoria' },
 ] as const;
 
-type PageKey = (typeof navItems)[number]['key'];
-
-const pages: Record<PageKey, JSX.Element> = {
-  dashboard: <DashboardPage />,
-  pessoas: <PessoasPage />,
-  categorias: <CategoriasPage />,
-  transacoes: <TransacoesPage />,
-  'totais-por-pessoa': <TotaisPorPessoaPage />,
-  'totais-por-categoria': <TotaisPorCategoriaPage />,
-};
-
 function App() {
-  const [activePage, setActivePage] = useState<PageKey>('dashboard');
-
   return (
     <div className="app-shell">
-      <Navbar items={[...navItems]} activeKey={activePage} onSelect={(key) => setActivePage(key as PageKey)} />
-      <main className="app-content">{pages[activePage]}</main>
+      <Navbar items={[...navItems]} />
+      <main className="app-content">
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/pessoas" element={<PessoasPage />} />
+          <Route path="/categorias" element={<CategoriasPage />} />
+          <Route path="/transacoes" element={<TransacoesPage />} />
+          <Route path="/totais-por-pessoa" element={<TotaisPorPessoaPage />} />
+          <Route path="/totais-por-categoria" element={<TotaisPorCategoriaPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
