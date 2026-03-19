@@ -1,4 +1,26 @@
-### Diagrama de Banco de Dados
+# Controle de Gastos Residencial
+
+## Stack utilizada
+
+### Front-end:
+- React v19.2 (LTS) via Vite v8.0.0
+- TypeScript & Node v20.20.0
+- TanStack Query (Gerenciamento de estado assíncrono e cache)
+- React Router (Navegação)
+- React Hook Form + Zod (Validação de Formulários)
+- Tailwind CSS + shadcn/ui (Estilização e Componentes)
+- Axios (Cliente HTTP)
+
+### Back-end:
+- C# e .NET 10 (ASP.NET Core Web API)
+- Entity Framework Core (ORM)
+- Swagger / OpenAPI (Documentação)
+- Arquitetura: Clean Architecture / Rich Domain
+
+### Banco de Dados:
+- PostgreSQL 18.3 (Rodando em Docker)
+
+## Diagrama de Banco de Dados
 
 ```mermaid
 erDiagram
@@ -26,8 +48,16 @@ erDiagram
         Guid CategoriaId FK
     }
 ```
+## Pré-requisitos
 
-### Subindo o PostgreSQL com Docker
+### Certifique-se de ter as seguintes ferramentas instaladas:
+
+- Git
+- .NET 10 SDK
+- Node.js v20.20.0+
+- Docker
+
+## Subindo o PostgreSQL com Docker
 
 1. Entre na pasta da API:
 
@@ -54,34 +84,60 @@ docker compose down -v
 docker compose up -d
 ```
 
-### Comandos de Migrations (Entity Framework Core)
+## Comandos de Migrations (Entity Framework Core)
 
-1. Entre no projeto de startup (`CGR.Api`):
+Entre no projeto de startup (`CGR.Api`):
 
 ```bash
 cd cgr-api/CGR.Api
 ```
 
-2. Restaure os pacotes:
+Restaure os pacotes:
 
 ```bash
 dotnet restore
 ```
 
-3. Crie a migration inicial:
+Crie a migration inicial:
 
 ```bash
 dotnet ef migrations add InitialCreate --project ../CGR.Infrastructure --startup-project . --context AppDbContext
 ```
 
-4. Aplique as migrations no banco:
+Aplique as migrations no banco:
 
 ```bash
 dotnet ef database update --project ../CGR.Infrastructure --startup-project . --context AppDbContext
 ```
 
-5. (Opcional) Gere o script SQL da migration:
+Gere o script SQL da migration:
 
 ```bash
 dotnet ef migrations script --project ../CGR.Infrastructure --startup-project . --context AppDbContext
 ```
+
+## Executando o Back-end
+
+Ainda no terminal, entre no projeto de inicialização, aplique as migrations e rode a API:
+
+```
+cd CGR.Api
+dotnet restore
+dotnet ef database update --project ../CGR.Infrastructure --startup-project . --context AppDbContext
+dotnet run
+```
+A API deve estar disponivel em https://localhost:44300
+
+Acesse o swagger em https://localhost:44300/swagger/index.html
+
+## Executando o Front-end
+
+Abra um novo terminal, navegue até a pasta do front, instale as dependências e inicie o servidor Vite:
+
+```
+cd cgr-frontend
+npm install
+npm run dev
+```
+
+A aplicação deve estar disponível em https://localhost:5173
