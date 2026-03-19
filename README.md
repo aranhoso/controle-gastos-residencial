@@ -59,25 +59,25 @@ erDiagram
 
 ## Subindo o PostgreSQL com Docker
 
-1. Entre na pasta da API:
+Entre na pasta da API:
 
 ```bash
 cd cgr-api
 ```
 
-2. Suba o container do PostgreSQL:
+Suba o container do PostgreSQL:
 
 ```bash
 docker compose up -d
 ```
 
-3. (Opcional) Acompanhe os logs do banco:
+(Opcional) Acompanhe os logs do banco:
 
 ```bash
 docker compose logs -f postgres
 ```
 
-4. (Quando precisar recriar o volume do banco local):
+(Quando precisar recriar o volume do banco local):
 
 ```bash
 docker compose down -v
