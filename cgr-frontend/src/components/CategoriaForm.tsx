@@ -4,7 +4,6 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 import { FinalidadeCategoria, type CategoriaRequestDTO, type CategoriaResponseDTO } from '@/types/categorias';
-import { useEffect } from 'react';
 
 import { useForm, Controller, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,7 +32,6 @@ export function CategoriaForm({ initialData, onSubmit, isLoading }: CategoriaFor
     handleSubmit,
     control,
     setError,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema) as Resolver<FormFields, unknown, FormFields>,
@@ -43,16 +41,7 @@ export function CategoriaForm({ initialData, onSubmit, isLoading }: CategoriaFor
     } : undefined
   });
 
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        descricao: initialData.descricao,
-        finalidade: initialData.finalidade as 1 | 2 | 3,
-      });
-    } else {
-      reset({ descricao: '', finalidade: undefined });
-    }
-  }, [initialData, reset]);
+
 
   const onFormSubmit: SubmitHandler<FormFields> = async (data) => {
     try {

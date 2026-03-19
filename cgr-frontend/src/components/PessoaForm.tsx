@@ -2,7 +2,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import type { PessoaRequestDTO, PessoaResponseDTO } from '@/types/pessoas';
-import { useEffect } from 'react';
 
 import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
@@ -30,7 +29,6 @@ export function PessoaForm({ initialData, onSubmit, isLoading }: PessoaFormProps
     register,
     handleSubmit,
     setError,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema) as Resolver<FormFields, unknown, FormFields>,
@@ -40,16 +38,7 @@ export function PessoaForm({ initialData, onSubmit, isLoading }: PessoaFormProps
     } : undefined
   });
 
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        nome: initialData.nome,
-        idade: initialData.idade,
-      });
-    } else {
-      reset({ nome: '', idade: undefined });
-    }
-  }, [initialData, reset]);
+
 
   const onFormSubmit: SubmitHandler<FormFields> = async (data) => {
     try {

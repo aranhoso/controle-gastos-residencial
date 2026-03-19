@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { usePessoas } from '@/hooks/use-pessoas';
 import { useCategorias } from '@/hooks/use-categorias';
 import { TipoTransacao, type TransacaoRequestDTO, type TransacaoResponseDTO } from '@/types/transacoes';
-import { useEffect } from 'react';
 
 import { useForm, Controller, type SubmitHandler, type Resolver } from 'react-hook-form';
 import { z } from 'zod';
@@ -43,7 +42,6 @@ export function TransacaoForm({ initialData, onSubmit, isLoading }: TransacaoFor
     handleSubmit,
     control,
     setError,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>({
     resolver: zodResolver(schema) as Resolver<FormFields, unknown, FormFields>,
@@ -56,19 +54,7 @@ export function TransacaoForm({ initialData, onSubmit, isLoading }: TransacaoFor
     } : undefined
   });
 
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        descricao: initialData.descricao,
-        valor: initialData.valor,
-        tipo: initialData.tipo as 1 | 2,
-        pessoaId: initialData.pessoaId,
-        categoriaId: initialData.categoriaId,
-      });
-    } else {
-      reset({ descricao: '', valor: undefined, tipo: undefined, pessoaId: '', categoriaId: '' });
-    }
-  }, [initialData, reset]);
+
 
   const onFormSubmit: SubmitHandler<FormFields> = async (data) => {
     try {

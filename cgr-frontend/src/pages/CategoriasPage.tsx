@@ -133,6 +133,7 @@ const CategoriasPage = () => {
             </SheetDescription>
           </SheetHeader>
           <CategoriaForm
+            key={editingCategoria ? editingCategoria.id : 'nova'}
             initialData={editingCategoria}
             onSubmit={handleSubmit}
             isLoading={isSaving}

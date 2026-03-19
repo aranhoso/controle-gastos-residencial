@@ -148,6 +148,7 @@ const TransacoesPage = () => {
             </SheetDescription>
           </SheetHeader>
           <TransacaoForm
+            key={editingTransacao ? editingTransacao.id : 'nova'}
             initialData={editingTransacao}
             onSubmit={handleSubmit}
             isLoading={isSaving}

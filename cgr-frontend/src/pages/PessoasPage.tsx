@@ -133,6 +133,7 @@ const PessoasPage = () => {
             </SheetDescription>
           </SheetHeader>
           <PessoaForm
+            key={editingPessoa ? editingPessoa.id : 'nova'}
             initialData={editingPessoa}
             onSubmit={handleSubmit}
             isLoading={isSaving}
