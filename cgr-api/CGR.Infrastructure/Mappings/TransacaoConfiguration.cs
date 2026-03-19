@@ -1,4 +1,4 @@
-﻿using CGR.Domain.Entities;
+using CGR.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,7 +32,7 @@ public class TransacaoConfiguration : IEntityTypeConfiguration<Transacao>
         builder.HasOne(t => t.Pessoa)
             .WithMany()
             .HasForeignKey(t => t.PessoaId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(t => t.Categoria)
             .WithMany()
