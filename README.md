@@ -86,6 +86,12 @@ docker compose up -d
 
 ## Comandos de Migrations (Entity Framework Core)
 
+Antes de executar os comandos abaixo, certifique-se de ter a ferramenta do Entity Framework instalada globalmente na sua máquina:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
 Entre no projeto de startup (`CGR.Api`):
 
 ```bash
@@ -98,13 +104,15 @@ Restaure os pacotes:
 dotnet restore
 ```
 
-Crie a migration inicial:
+**Atenção:** Se você acabou de clonar o repositório, não precisa rodar o comando de `add` abaixo. As migrations já existem no projeto. Pule direto para o passo de **Aplique as migrations no banco**.
+
+Crie uma nova migration (apenas quando você alterar ou criar novas entidades no banco de dados):
 
 ```bash
-dotnet ef migrations add InitialCreate --project ../CGR.Infrastructure --startup-project . --context AppDbContext
+dotnet ef migrations add NomeDaSuaMigration --project ../CGR.Infrastructure --startup-project . --context AppDbContext
 ```
 
-Aplique as migrations no banco:
+Aplique as migrations existentes no banco:
 
 ```bash
 dotnet ef database update --project ../CGR.Infrastructure --startup-project . --context AppDbContext
