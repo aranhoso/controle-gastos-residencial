@@ -134,9 +134,9 @@ dotnet restore
 dotnet ef database update --project ../CGR.Infrastructure --startup-project . --context AppDbContext
 dotnet run
 ```
-A API deve estar disponivel em https://localhost:44300
+A API deve estar disponivel em http://localhost:5116
 
-Acesse o swagger em https://localhost:44300/swagger/index.html
+Acesse o swagger em http://localhost:5116/swagger/index.html
 
 ## Executando o Front-end
 
@@ -148,4 +148,4 @@ npm install
 npm run dev
 ```
 
-A aplicação deve estar disponível em https://localhost:5173
+A aplicação deve estar disponível em http://localhost:5173
