@@ -4,6 +4,16 @@ import { PessoaForm } from '../components/PessoaForm';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '../components/ui/sheet';
 import { Button } from '../components/ui/button';
 import { Edit2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { PessoaRequestDTO, PessoaResponseDTO } from '../types/pessoas';
 
@@ -15,6 +25,8 @@ const PessoasPage = () => {
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingPessoa, setEditingPessoa] = useState<PessoaResponseDTO | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [pessoaToDelete, setPessoaToDelete] = useState<string | null>(null);
 
   const handleOpenCreate = () => {
     setEditingPessoa(null);
@@ -47,13 +59,19 @@ const PessoasPage = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta pessoa?')) {
-      deleteMutation.mutate(id, {
-        onSuccess: () => toast.success('Pessoa excluída com sucesso'),
-        onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir pessoa'),
-      });
-    }
+  const handleDeleteClick = (id: string) => {
+    setPessoaToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!pessoaToDelete) return;
+    deleteMutation.mutate(pessoaToDelete, {
+      onSuccess: () => toast.success('Pessoa excluída com sucesso'),
+      onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir pessoa'),
+    });
+    setIsDeleteDialogOpen(false);
+    setPessoaToDelete(null);
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
@@ -111,7 +129,7 @@ const PessoasPage = () => {
                         <Edit2Icon />
                         <span className="sr-only">Editar</span>
                       </Button>
-                      <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(pessoa.id)}>
+                      <Button variant="destructive" size="icon-sm" onClick={() => handleDeleteClick(pessoa.id)}>
                         <Trash2Icon />
                         <span className="sr-only">Excluir</span>
                       </Button>
@@ -140,6 +158,23 @@ const PessoasPage = () => {
           />
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Pessoa</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta pessoa? Todas as transações associadas a ela também serão excluídas. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPessoaToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

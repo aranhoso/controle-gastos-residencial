@@ -4,6 +4,16 @@ import { CategoriaForm } from '../components/CategoriaForm';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '../components/ui/sheet';
 import { Button } from '../components/ui/button';
 import { Edit2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { CategoriaRequestDTO, CategoriaResponseDTO } from '../types/categorias';
 
@@ -15,6 +25,8 @@ const CategoriasPage = () => {
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingCategoria, setEditingCategoria] = useState<CategoriaResponseDTO | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [categoriaToDelete, setCategoriaToDelete] = useState<string | null>(null);
 
   const handleOpenCreate = () => {
     setEditingCategoria(null);
@@ -47,13 +59,19 @@ const CategoriasPage = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
-      deleteMutation.mutate(id, {
-        onSuccess: () => toast.success('Categoria excluída com sucesso'),
-        onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir categoria'),
-      });
-    }
+  const handleDeleteClick = (id: string) => {
+    setCategoriaToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!categoriaToDelete) return;
+    deleteMutation.mutate(categoriaToDelete, {
+      onSuccess: () => toast.success('Categoria excluída com sucesso'),
+      onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir categoria'),
+    });
+    setIsDeleteDialogOpen(false);
+    setCategoriaToDelete(null);
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
@@ -111,7 +129,7 @@ const CategoriasPage = () => {
                         <Edit2Icon />
                         <span className="sr-only">Editar</span>
                       </Button>
-                      <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(categoria.id)}>
+                      <Button variant="destructive" size="icon-sm" onClick={() => handleDeleteClick(categoria.id)}>
                         <Trash2Icon />
                         <span className="sr-only">Excluir</span>
                       </Button>
@@ -140,6 +158,23 @@ const CategoriasPage = () => {
           />
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Categoria</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta categoria? Se houverem transações associadas, a exclusão poderá falhar. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setCategoriaToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -4,6 +4,16 @@ import { TransacaoForm } from '../components/TransacaoForm';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '../components/ui/sheet';
 import { Button } from '../components/ui/button';
 import { Edit2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import type { TransacaoRequestDTO, TransacaoResponseDTO } from '../types/transacoes';
 
@@ -22,6 +32,8 @@ const TransacoesPage = () => {
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [editingTransacao, setEditingTransacao] = useState<TransacaoResponseDTO | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [transacaoToDelete, setTransacaoToDelete] = useState<string | null>(null);
 
   const handleOpenCreate = () => {
     setEditingTransacao(null);
@@ -54,13 +66,19 @@ const TransacoesPage = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
-      deleteMutation.mutate(id, {
-        onSuccess: () => toast.success('Transação excluída com sucesso'),
-        onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir transação'),
-      });
-    }
+  const handleDeleteClick = (id: string) => {
+    setTransacaoToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!transacaoToDelete) return;
+    deleteMutation.mutate(transacaoToDelete, {
+      onSuccess: () => toast.success('Transação excluída com sucesso'),
+      onError: (err) => toast.error(err instanceof Error ? err.message : 'Erro ao excluir transação'),
+    });
+    setIsDeleteDialogOpen(false);
+    setTransacaoToDelete(null);
   };
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
@@ -126,7 +144,7 @@ const TransacoesPage = () => {
                         <Edit2Icon />
                         <span className="sr-only">Editar</span>
                       </Button>
-                      <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(transacao.id)}>
+                      <Button variant="destructive" size="icon-sm" onClick={() => handleDeleteClick(transacao.id)}>
                         <Trash2Icon />
                         <span className="sr-only">Excluir</span>
                       </Button>
@@ -155,6 +173,23 @@ const TransacoesPage = () => {
           />
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Transação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta transação? Ela deixará de constar nos totais. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setTransacaoToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
