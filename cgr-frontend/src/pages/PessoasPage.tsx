@@ -31,30 +31,19 @@ const PessoasPage = () => {
     if (!open) setEditingPessoa(null);
   };
 
-  const handleSubmit = (formData: PessoaRequestDTO) => {
-    if (editingPessoa) {
-      updateMutation.mutate(
-        { id: editingPessoa.id, dto: formData },
-        {
-          onSuccess: () => {
-            toast.success('Pessoa atualizada com sucesso');
-            setIsSheetOpen(false);
-          },
-          onError: (err) => {
-            toast.error(err instanceof Error ? err.message : 'Erro ao atualizar pessoa');
-          },
-        }
-      );
-    } else {
-      createMutation.mutate(formData, {
-        onSuccess: () => {
-          toast.success('Pessoa criada com sucesso');
-          setIsSheetOpen(false);
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : 'Erro ao criar pessoa');
-        },
-      });
+  const handleSubmit = async (formData: PessoaRequestDTO) => {
+    try {
+      if (editingPessoa) {
+        await updateMutation.mutateAsync({ id: editingPessoa.id, dto: formData });
+        toast.success('Pessoa atualizada com sucesso');
+      } else {
+        await createMutation.mutateAsync(formData);
+        toast.success('Pessoa criada com sucesso');
+      }
+      setIsSheetOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar pessoa');
+      throw err;
     }
   };
 

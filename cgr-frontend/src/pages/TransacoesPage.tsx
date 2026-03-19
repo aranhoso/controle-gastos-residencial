@@ -38,30 +38,19 @@ const TransacoesPage = () => {
     if (!open) setEditingTransacao(null);
   };
 
-  const handleSubmit = (formData: TransacaoRequestDTO) => {
-    if (editingTransacao) {
-      updateMutation.mutate(
-        { id: editingTransacao.id, dto: formData },
-        {
-          onSuccess: () => {
-            toast.success('Transação atualizada com sucesso');
-            setIsSheetOpen(false);
-          },
-          onError: (err) => {
-            toast.error(err instanceof Error ? err.message : 'Erro ao atualizar transação');
-          },
-        }
-      );
-    } else {
-      createMutation.mutate(formData, {
-        onSuccess: () => {
-          toast.success('Transação criada com sucesso');
-          setIsSheetOpen(false);
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : 'Erro ao criar transação');
-        },
-      });
+  const handleSubmit = async (formData: TransacaoRequestDTO) => {
+    try {
+      if (editingTransacao) {
+        await updateMutation.mutateAsync({ id: editingTransacao.id, dto: formData });
+        toast.success('Transação atualizada com sucesso');
+      } else {
+        await createMutation.mutateAsync(formData);
+        toast.success('Transação criada com sucesso');
+      }
+      setIsSheetOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar transação');
+      throw err;
     }
   };
 

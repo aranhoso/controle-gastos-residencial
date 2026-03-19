@@ -1,62 +1,98 @@
-import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import type { PessoaRequestDTO, PessoaResponseDTO } from '../types/pessoas';
+import type { PessoaRequestDTO, PessoaResponseDTO } from '@/types/pessoas';
+import { useEffect } from 'react';
+
+import { useForm, type SubmitHandler, type Resolver } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+
+const schema = z.object({
+  nome: z.string().min(1, 'Nome obrigatório').max(200, 'Máximo de 200 caracteres'),
+  idade:
+    z.preprocess((v) => typeof v === 'string' ? Number(v) : v,
+    z.number({ message: 'Digite uma idade válida' }).int('Idade deve ser um número inteiro').nonnegative('Idade deve ser positiva')),
+});
+
+type FormFields = z.infer<typeof schema>;
 
 interface PessoaFormProps {
   initialData?: PessoaResponseDTO | null;
-  onSubmit: (data: PessoaRequestDTO) => void;
+  onSubmit: (data: PessoaRequestDTO) => Promise<void>;
   isLoading?: boolean;
 }
 
 export function PessoaForm({ initialData, onSubmit, isLoading }: PessoaFormProps) {
-  const [nome, setNome] = useState(initialData?.nome ?? '');
-  const [idade, setIdade] = useState<string>(initialData?.idade ? String(initialData.idade) : '');
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>({
+    resolver: zodResolver(schema) as Resolver<FormFields, unknown, FormFields>,
+    defaultValues: initialData ? {
+      nome: initialData.nome,
+      idade: initialData.idade,
+    } : undefined
+  });
 
   useEffect(() => {
     if (initialData) {
-      setNome(initialData.nome);
-      setIdade(String(initialData.idade));
+      reset({
+        nome: initialData.nome,
+        idade: initialData.idade,
+      });
     } else {
-      setNome('');
-      setIdade('');
+      reset({ nome: '', idade: undefined });
     }
-  }, [initialData]);
+  }, [initialData, reset]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nome || !idade) return;
-    onSubmit({ nome, idade: Number(idade) });
-  };
+  const onFormSubmit: SubmitHandler<FormFields> = async (data) => {
+    try {
+      await onSubmit({
+        nome: data.nome,
+        idade: data.idade,
+      });
+    } catch (error) {
+      setError("root", {
+        message: error instanceof Error ? error.message : 'Erro desconhecido ao salvar',
+      });
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-4">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="nome">Nome</Label>
+    <form className="flex flex-col space-y-4 py-4" onSubmit={handleSubmit(onFormSubmit)}>
+
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Nome</Label>
         <Input
-          id="nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          placeholder="Ex: João da Silva"
-          required
+          {...register("nome")}
+          type="text"
+          placeholder='Ex: João da Silva'
         />
+        {errors.nome && <span className='text-sm text-red-500'>{errors.nome.message}</span>}
       </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="idade">Idade</Label>
+
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Idade</Label>
         <Input
-          id="idade"
+          {...register("idade")}
           type="number"
           min="0"
-          value={idade}
-          onChange={(e) => setIdade(e.target.value)}
-          placeholder="Ex: 30"
-          required
+          placeholder='Ex: 30'
         />
+        {errors.idade && <span className='text-sm text-red-500'>{errors.idade.message}</span>}
       </div>
-      <Button type="submit" disabled={isLoading} className="mt-4">
-        {isLoading ? 'Salvando...' : 'Salvar'}
+
+      <Button disabled={isSubmitting || isLoading} type="submit" className="mt-2 ms-2 me-2">
+        {isSubmitting || isLoading ? "Salvando..." : "Salvar Pessoa"}
       </Button>
+
+      {errors.root && <div className='p-2 bg-red-100 text-red-700 rounded'>{errors.root.message}</div>}
     </form>
   );
 }

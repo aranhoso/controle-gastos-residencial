@@ -1,130 +1,224 @@
-import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useCategorias } from '../hooks/use-categorias';
-import { usePessoas } from '../hooks/use-pessoas';
-import { TipoTransacao, type TransacaoRequestDTO, type TransacaoResponseDTO } from '../types/transacoes';
+
+import { usePessoas } from '@/hooks/use-pessoas';
+import { useCategorias } from '@/hooks/use-categorias';
+import { TipoTransacao, type TransacaoRequestDTO, type TransacaoResponseDTO } from '@/types/transacoes';
+import { useEffect } from 'react';
+
+import { useForm, Controller, type SubmitHandler, type Resolver } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+
+const schema = z.object({
+  descricao: z.string().min(1, 'Descrição obrigatória').max(400, 'Máximo de 400 caracteres'),
+  valor: 
+    z.preprocess((v) => typeof v === 'string' ? Number(v) : v, 
+    z.number({ message: 'Digite um valor válido' }).positive('O valor deve ser maior que zero')),
+  tipo: 
+    z.preprocess((v) => typeof v === 'string' ? Number(v) : v, 
+    z.union([z.literal(1), z.literal(2)], { message: 'Tipo inválido' })),
+  pessoaId: z.uuid('Selecione uma pessoa'),
+  categoriaId: z.uuid('Selecione uma categoria'),
+});
+
+type FormFields = z.infer<typeof schema>;
 
 interface TransacaoFormProps {
   initialData?: TransacaoResponseDTO | null;
-  onSubmit: (data: TransacaoRequestDTO) => void;
+  onSubmit: (data: TransacaoRequestDTO) => Promise<void>;
   isLoading?: boolean;
 }
 
 export function TransacaoForm({ initialData, onSubmit, isLoading }: TransacaoFormProps) {
-  const { data: categorias } = useCategorias();
-  const { data: pessoas } = usePessoas();
 
-  const [descricao, setDescricao] = useState(initialData?.descricao ?? '');
-  const [valor, setValor] = useState<string>(initialData?.valor ? String(initialData.valor) : '');
-  const [tipo, setTipo] = useState<string>(initialData?.tipo ? String(initialData.tipo) : '');
-  const [pessoaId, setPessoaId] = useState<string>(initialData?.pessoaId ?? '');
-  const [categoriaId, setCategoriaId] = useState<string>(initialData?.categoriaId ?? '');
+  const { data: pessoas } = usePessoas();
+  const { data: categorias } = useCategorias();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setError,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>({
+    resolver: zodResolver(schema) as Resolver<FormFields, unknown, FormFields>,
+    defaultValues: initialData ? {
+      descricao: initialData.descricao,
+      valor: initialData.valor,
+      tipo: initialData.tipo as 1 | 2,
+      pessoaId: initialData.pessoaId,
+      categoriaId: initialData.categoriaId,
+    } : undefined
+  });
 
   useEffect(() => {
     if (initialData) {
-      setDescricao(initialData.descricao);
-      setValor(String(initialData.valor));
-      setTipo(String(initialData.tipo));
-      setPessoaId(initialData.pessoaId);
-      setCategoriaId(initialData.categoriaId);
+      reset({
+        descricao: initialData.descricao,
+        valor: initialData.valor,
+        tipo: initialData.tipo as 1 | 2,
+        pessoaId: initialData.pessoaId,
+        categoriaId: initialData.categoriaId,
+      });
     } else {
-      setDescricao('');
-      setValor('');
-      setTipo('');
-      setPessoaId('');
-      setCategoriaId('');
+      reset({ descricao: '', valor: undefined, tipo: undefined, pessoaId: '', categoriaId: '' });
     }
-  }, [initialData]);
+  }, [initialData, reset]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!descricao || !valor || !tipo || !pessoaId || !categoriaId) return;
-    
-    const valorNumerico = Number(valor);
-
-    onSubmit({
-      descricao,
-      valor: valorNumerico,
-      tipo: Number(tipo) as TipoTransacao,
-      pessoaId,
-      categoriaId,
-    });
-  };
+  const onFormSubmit: SubmitHandler<FormFields> = async (data) => {
+    try {
+      await onSubmit({
+        descricao: data.descricao,
+        valor: data.valor,
+        tipo: data.tipo,
+        pessoaId: data.pessoaId,
+        categoriaId: data.categoriaId,
+      });
+    } catch (error) {
+      setError("root", {
+        message: error instanceof Error ? error.message : 'Erro desconhecido ao salvar',
+      });
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-4">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="descricao">Descrição</Label>
+    <form className="flex flex-col space-y-4 py-4" onSubmit={handleSubmit(onFormSubmit)}>
+      
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Descrição</Label>
         <Input
-          id="descricao"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          placeholder="Ex: Conta de Luz"
-          required
+          {...register("descricao")}
+          type="text"
+          placeholder='Ex: Conta de Luz'
         />
+        {errors.descricao && <span className='text-sm text-red-500'>{errors.descricao.message}</span>}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="valor">Valor (R$)</Label>
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Valor</Label>
         <Input
-          id="valor"
+          {...register("valor")}
           type="number"
           step="0.01"
-          min="0"
-          value={valor}
-          onChange={(e) => setValor(e.target.value)}
-          placeholder="Ex: 95,40"
-          required
+          placeholder='Ex: 150.50'
         />
+        {errors.valor && <span className='text-sm text-red-500'>{errors.valor.message}</span>}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="tipo">Tipo da Transação</Label>
-        <Select value={tipo} onValueChange={(val) => setTipo(val || '')} required>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={String(TipoTransacao.Receita)}>Receita</SelectItem>
-            <SelectItem value={String(TipoTransacao.Despesa)}>Despesa</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Tipo</Label>
+        <Controller
+          name="tipo"
+          control={control}
+          render={({ field }) => (
+            <Select 
+              onValueChange={(val) => field.onChange(Number(val))} 
+              // A MÁGICA ESTÁ AQUI: Trocamos defaultValue por value.
+              // Se field.value existir, convertemos para string, senão mandamos vazio.
+              value={field.value ? field.value.toString() : ""} 
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo">
+                  {field.value === TipoTransacao.Receita
+                    ? "Receita"
+                    : field.value === TipoTransacao.Despesa
+                      ? "Despesa"
+                      : undefined}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={TipoTransacao.Receita.toString()}>Receita</SelectItem>
+                <SelectItem value={TipoTransacao.Despesa.toString()}>Despesa</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
+        {errors.tipo && <span className='text-sm text-red-500'>{errors.tipo.message}</span>}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="pessoa">Pessoa</Label>
-        <Select value={pessoaId} onValueChange={(val) => setPessoaId(val || '')} required>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione a pessoa..." />
-          </SelectTrigger>
-          <SelectContent>
-            {pessoas?.map((p) => (
-              <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Pessoa</Label>
+        <Controller
+          name="pessoaId"
+          control={control}
+          render={({ field }) => {
+            const semPessoas = !pessoas || pessoas.length === 0;
+            const pessoaSelecionada = pessoas?.find((p) => p.id === field.value);
+            return (
+              <Select
+                onValueChange={field.onChange}
+                value={field.value || ""}
+                disabled={semPessoas}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={semPessoas ? "Nenhuma pessoa cadastrada" : "Selecione a pessoa..."}>
+                    {pessoaSelecionada ? pessoaSelecionada.nome : undefined}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {!semPessoas ? (
+                    pessoas.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-gray-500 text-center">
+                      Você não possui nenhuma pessoa cadastrada.
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            );
+          }}
+        />
+        {errors.pessoaId && <span className='text-sm text-red-500'>{errors.pessoaId.message}</span>}
+      </div>
+      <div className="flex flex-col gap-1 ms-2 me-2">
+        <Label>Categoria</Label>
+        <Controller
+          name="categoriaId"
+          control={control}
+          render={({ field }) => {
+            const semCategorias = !categorias || categorias.length === 0;
+            const categoriaSelecionada = categorias?.find((c) => c.id === field.value);
+            return (
+              <Select
+                onValueChange={field.onChange}
+                value={field.value || ""}
+                disabled={semCategorias}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={semCategorias ? "Nenhuma categoria cadastrada" : "Selecione a categoria..."}>
+                    {categoriaSelecionada ? categoriaSelecionada.descricao : undefined}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {!semCategorias ? (
+                    categorias.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.descricao}</SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-sm text-gray-500 text-center">
+                      Você não possui nenhuma categoria cadastrada.
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            );
+          }}
+        />
+        {errors.categoriaId && <span className='text-sm text-red-500'>{errors.categoriaId.message}</span>}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="categoria">Categoria</Label>
-        <Select value={categoriaId} onValueChange={(val) => setCategoriaId(val || '')} required>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione a categoria..." />
-          </SelectTrigger>
-          <SelectContent>
-            {categorias?.map((c) => (
-              <SelectItem key={c.id} value={c.id}>{c.descricao}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Button type="submit" disabled={isLoading} className="mt-4">
-        {isLoading ? 'Salvando...' : 'Salvar'}
+      <Button disabled={isSubmitting || isLoading} type="submit" className="mt-2 ms-2 me-2">
+        {isSubmitting || isLoading ? "Salvando..." : "Salvar Transação"}
       </Button>
+
+      {errors.root && <div className='p-2 bg-red-100 text-red-700 rounded'>{errors.root.message}</div>}
     </form>
   );
 }

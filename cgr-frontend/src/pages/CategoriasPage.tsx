@@ -31,30 +31,19 @@ const CategoriasPage = () => {
     if (!open) setEditingCategoria(null);
   };
 
-  const handleSubmit = (formData: CategoriaRequestDTO) => {
-    if (editingCategoria) {
-      updateMutation.mutate(
-        { id: editingCategoria.id, dto: formData },
-        {
-          onSuccess: () => {
-            toast.success('Categoria atualizada com sucesso');
-            setIsSheetOpen(false);
-          },
-          onError: (err) => {
-            toast.error(err instanceof Error ? err.message : 'Erro ao atualizar categoria');
-          },
-        }
-      );
-    } else {
-      createMutation.mutate(formData, {
-        onSuccess: () => {
-          toast.success('Categoria criada com sucesso');
-          setIsSheetOpen(false);
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : 'Erro ao criar categoria');
-        },
-      });
+  const handleSubmit = async (formData: CategoriaRequestDTO) => {
+    try {
+      if (editingCategoria) {
+        await updateMutation.mutateAsync({ id: editingCategoria.id, dto: formData });
+        toast.success('Categoria atualizada com sucesso');
+      } else {
+        await createMutation.mutateAsync(formData);
+        toast.success('Categoria criada com sucesso');
+      }
+      setIsSheetOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar categoria');
+      throw err;
     }
   };
 
