@@ -6,7 +6,7 @@
 - React v19.2 (LTS) via Vite v8.0.0
 - TypeScript & Node v20.20.0
 - TanStack Query (Gerenciamento de estado assíncrono e cache)
-- React Router (Navegação)
+- React Router (Routing)
 - React Hook Form + Zod (Validação de Formulários)
 - Tailwind CSS + shadcn/ui (Estilização e Componentes)
 - Axios (Cliente HTTP)
@@ -15,7 +15,7 @@
 - C# e .NET 10 (ASP.NET Core Web API)
 - Entity Framework Core (ORM)
 - Swagger / OpenAPI (Documentação)
-- Arquitetura: Clean Architecture / Rich Domain
+- Arquitetura: Clean Architecture / DDD
 
 ### Banco de Dados:
 - PostgreSQL 18.3 (Rodando em Docker)
