@@ -1,4 +1,4 @@
-﻿using CGR.Domain.Enums;
+using CGR.Domain.Enums;
 
 namespace CGR.Domain.Entities;
 
@@ -68,6 +68,8 @@ public class Categoria
     {
         if (string.IsNullOrWhiteSpace(descricao))
             throw new ArgumentException("A descrição é obrigatória.");
+        if (descricao.Length > 400)
+            throw new ArgumentException("A descrição não pode exceder 400 caracteres.");
         if (!Enum.IsDefined(finalidade))
             throw new ArgumentException("A finalidade de categoria inválida.");
     }

@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 
 const schema = z.object({
-  descricao: z.string().min(1, 'Descrição obrigatória').max(200, 'Máximo de 200 caracteres'),
+  descricao: z.string().min(1, 'Descrição obrigatória').max(400, 'Máximo de 400 caracteres'),
   finalidade:
     z.preprocess((v) => typeof v === 'string' ? Number(v) : v,
     z.union([z.literal(1), z.literal(2), z.literal(3)], { message: 'Finalidade inválida' })),
